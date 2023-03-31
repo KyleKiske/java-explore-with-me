@@ -8,11 +8,11 @@ import ru.practicum.model.EndpointHitDto;
 public class HitMapper {
 
     public EndpointHit endpointHitDtoToEndpointHit(EndpointHitDto endpointHitDto) {
-        return EndpointHit.builder()
-                .app(endpointHitDto.getApp())
-                .uri(endpointHitDto.getUri())
-                .ip(endpointHitDto.getIp())
-                .timestamp(endpointHitDto.getTimestamp())
-                .build();
+        EndpointHit endpointHit = new EndpointHit();
+        endpointHit.setApp(endpointHitDto.getApp());
+        endpointHit.setUri(endpointHitDto.getUri());
+        endpointHit.setIp(endpointHitDto.getIp());
+        endpointHit.setTimestamp(endpointHitDto.getTimestamp());
+        return endpointHit;
     }
 }
