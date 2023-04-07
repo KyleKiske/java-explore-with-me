@@ -2,8 +2,8 @@ package ru.practicum.model;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ResponseStatsDto {
     private String app;
