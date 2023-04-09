@@ -45,6 +45,9 @@ public class UserRequestService {
         if (event.getParticipantLimit() != 0 && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new RequestValidationException("Participants limit has already been reached.");
         }
+        if (requestRepository.existsByEventIdAndRequesterId(eventId, userId)){
+            throw new RequestValidationException("Request from this user for this event already exists");
+        }
         Request request = new Request();
         request.setRequester(requester);
         request.setEvent(event);
