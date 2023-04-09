@@ -55,6 +55,7 @@ public class UserRequestService {
             request.setStatus(RequestStatus.PENDING);
         } else {
             request.setStatus(RequestStatus.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         }
         request.setCreated(LocalDateTime.now());
         request = requestRepository.save(request);
@@ -68,9 +69,11 @@ public class UserRequestService {
                 .orElseThrow(() -> new UserNotFoundException(requestId.toString()));
         if (request.getStatus().equals(RequestStatus.CANCELED)) {
             throw new RequestValidationException("Request was already canceled.");
+        } else if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
+            Event event = eventRepository.findById(request.getEvent().getId()).get();
+            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
         }
         request.setStatus(RequestStatus.CANCELED);
-        requestRepository.save(request);
         return requestMapper.requestToDto(request);
     }
 }
