@@ -58,14 +58,6 @@ public class EventService {
         }
 
         size = from + size - 1;
-        System.out.println(text);
-        System.out.println(categories);
-        System.out.println(paid);
-        System.out.println(rangeStart);
-        System.out.println(rangeEnd);
-        System.out.println(onlyAvailable);
-        System.out.println(from);
-        System.out.println(size);
         if (!onlyAvailable) {
             eventList = eventRepository.findPublicNotAvailable(
                     text, categories, paid, rangeStart, rangeEnd, State.PUBLISHED, from, size);
@@ -73,7 +65,6 @@ public class EventService {
             eventList = eventRepository.findPublicAvailable(text, categories, paid, rangeStart,
                     rangeEnd, State.PUBLISHED, from, size);
         }
-        System.out.println("list size = " + eventList.size());
         if (eventList.isEmpty()) {
             return List.of();
         }

@@ -58,12 +58,15 @@ public class CompilationService {
             List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
                     LocalDateTime.now().plusYears(10).format(dateTimeFormatter), uris, false);
             Map<Long, Long> hits = new HashMap<>();
-            for (ResponseStatsDto responseStatsDto: stats) {
-                Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
-                hits.put(id, responseStatsDto.getHits());
-            }
-            for (EventShortDto eventShortDto: eventShortDtoList) {
-                eventShortDto.setViews(hits.get(eventShortDto.getId()));
+
+            if (stats != null && !stats.isEmpty() && stats.get(0).getUri().matches("\\d")) {
+                for (ResponseStatsDto responseStatsDto: stats) {
+                    Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
+                    hits.put(id, responseStatsDto.getHits());
+                }
+                for (EventShortDto eventShortDto: eventShortDtoList) {
+                    eventShortDto.setViews(hits.get(eventShortDto.getId()));
+                }
             }
             compilationDto.setEvents(eventShortDtoList);
             compilationDtoList.add(compilationDto);
@@ -87,12 +90,14 @@ public class CompilationService {
         List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
                 LocalDateTime.now().plusYears(10).format(dateTimeFormatter), uris, false);
         Map<Long, Long> hits = new HashMap<>();
-        for (ResponseStatsDto responseStatsDto: stats) {
-            Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
-            hits.put(id, responseStatsDto.getHits());
-        }
-        for (EventShortDto eventShortDto: eventShortDtoList) {
-            eventShortDto.setViews(hits.get(eventShortDto.getId()));
+        if (stats != null && !stats.isEmpty() && stats.get(0).getUri().matches("\\d")) {
+            for (ResponseStatsDto responseStatsDto : stats) {
+                Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
+                hits.put(id, responseStatsDto.getHits());
+            }
+            for (EventShortDto eventShortDto : eventShortDtoList) {
+                eventShortDto.setViews(hits.get(eventShortDto.getId()));
+            }
         }
         CompilationDto compilationDto = compilationMapper.compilationToCompilationDto(compilation);
         compilationDto.setEvents(eventShortDtoList);
