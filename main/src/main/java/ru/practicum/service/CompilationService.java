@@ -48,26 +48,25 @@ public class CompilationService {
         for (Compilation compilation: compilations) {
             CompilationDto compilationDto = compilationMapper.compilationToCompilationDto(compilation);
             List<Long> eventIds = compEventRepository.findEventIdsByCompilationId(compilation.getId());
-            if (!eventIds.isEmpty()) {
-                List<Event> eventList = eventRepository.findAllById(eventIds);
-                List<EventShortDto> eventShortDtoList = eventList.stream()
-                        .map(eventMapper::eventToShortDto).collect(Collectors.toList());
-                List<String> uris = new ArrayList<>();
-                for (EventShortDto eventShortDto: eventShortDtoList) {
-                    uris.add(URI + eventShortDto.getId());
-                }
-                List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
-                        LocalDateTime.now().plusYears(10).format(dateTimeFormatter), uris, false);
-                Map<Long, Long> hits = new HashMap<>();
-                for (ResponseStatsDto responseStatsDto: stats) {
-                    Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
-                    hits.put(id, responseStatsDto.getHits());
-                }
-                for (EventShortDto eventShortDto: eventShortDtoList) {
-                    eventShortDto.setViews(hits.get(eventShortDto.getId()));
-                }
-                compilationDtoList.add(compilationDto);
+            List<Event> eventList = eventRepository.findAllById(eventIds);
+            List<EventShortDto> eventShortDtoList = eventList.stream()
+                    .map(eventMapper::eventToShortDto).collect(Collectors.toList());
+            List<String> uris = new ArrayList<>();
+            for (EventShortDto eventShortDto: eventShortDtoList) {
+                uris.add(URI + eventShortDto.getId());
             }
+            List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
+                    LocalDateTime.now().plusYears(10).format(dateTimeFormatter), uris, false);
+            Map<Long, Long> hits = new HashMap<>();
+            for (ResponseStatsDto responseStatsDto: stats) {
+                Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
+                hits.put(id, responseStatsDto.getHits());
+            }
+            for (EventShortDto eventShortDto: eventShortDtoList) {
+                eventShortDto.setViews(hits.get(eventShortDto.getId()));
+            }
+            compilationDto.setEvents(eventShortDtoList);
+            compilationDtoList.add(compilationDto);
         }
         return compilationDtoList;
 
