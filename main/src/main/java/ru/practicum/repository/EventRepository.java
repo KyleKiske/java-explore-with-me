@@ -59,15 +59,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findPublicNotAvailable(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                        LocalDateTime rangeEnd, State state, Long from, Long size);
 
-    List<Event> findByAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdInAndPaidAndEventDateBetweenAndState(
-            String text1,
-            String text2,
-            List<Long> categories,
-            Boolean paid,
-            LocalDateTime rangeStart,
-            LocalDateTime rangeEnd,
-            State state,
-            Pageable pageable);
+    List<Event> findAllByCategoryId(Long categoryId);
 
     List<Event> findAllByInitiatorId(long userId, Pageable pageable);
 

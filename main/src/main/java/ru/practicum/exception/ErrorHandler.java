@@ -137,9 +137,19 @@ public class ErrorHandler {
                 LocalDateTime.now().format(dateTimeFormatter));
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(EventPublishingException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleEventPublishingException(final EventPublishingException e) {
+        log.info("409 {}", e.getMessage());
+        return new ApiError(HttpStatus.CONFLICT.toString(),
+                "Integrity constraint has been violated.",
+                e.getMessage(),
+                LocalDateTime.now().format(dateTimeFormatter));
+    }
+
+    @ExceptionHandler(CategoryDeletionConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleCategoryDeletionConflictException(final CategoryDeletionConflictException e) {
         log.info("409 {}", e.getMessage());
         return new ApiError(HttpStatus.CONFLICT.toString(),
                 "Integrity constraint has been violated.",
