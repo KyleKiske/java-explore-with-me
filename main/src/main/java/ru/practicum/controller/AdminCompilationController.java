@@ -10,6 +10,8 @@ import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.notDto.UpdateCompilationRequest;
 import ru.practicum.service.AdminCompilationService;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Validated
 @RestController
@@ -21,7 +23,7 @@ public class AdminCompilationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto createCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+    public CompilationDto createCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         CompilationDto compilationDto = adminCompilationService.addCompilation(newCompilationDto);
         log.info("Создана подборка {}", compilationDto.getTitle());
         return compilationDto;

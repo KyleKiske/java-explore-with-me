@@ -6,6 +6,7 @@ import lombok.Setter;
 import ru.practicum.model.Location;
 
 import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class NewEventDto {
     private Long category;
     @Size(min = 20, message = "Минимальная длина описания - 20 символов")
     @Size(max = 7000, message = "Максимальная длина описания - 7000 символов")
+    @NotBlank(message = "Field: description. Error: Field must not be blank.")
     private String description;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

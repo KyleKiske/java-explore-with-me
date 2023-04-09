@@ -46,7 +46,7 @@ public class EventMapper {
         eventFullDto.setEventDate(event.getEventDate());
         eventFullDto.setId(event.getId());
         eventFullDto.setInitiator(userMapper.userToShortDto(event.getInitiator()));
-        eventFullDto.setLocation(new Location(event.getLocationLon(),event.getLocationLat()));
+        eventFullDto.setLocation(new Location(event.getLocationLat(),event.getLocationLon()));
         eventFullDto.setPaid(event.getPaid());
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         eventFullDto.setPublishedOn(event.getPublishedOn());

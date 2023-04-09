@@ -9,6 +9,8 @@ import ru.practicum.dto.NewCategoryDto;
 import ru.practicum.model.Category;
 import ru.practicum.service.AdminCategoryService;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Validated
 @RestController
@@ -20,7 +22,7 @@ public class AdminCategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category createCategory(@RequestBody NewCategoryDto newCategoryDto) {
+    public Category createCategory(@RequestBody @Validated NewCategoryDto newCategoryDto) {
         Category category = adminCategoryService.addCategory(newCategoryDto);
         log.info("Создана категория {}", category.getName());
         return category;
@@ -35,7 +37,7 @@ public class AdminCategoryController {
 
     @PatchMapping("/{catId}")
     public Category redactCategory(@PathVariable long catId,
-                                   @RequestBody NewCategoryDto newCategoryDto) {
+                                   @RequestBody @Valid NewCategoryDto newCategoryDto) {
         Category category = adminCategoryService.redactCategory(catId, newCategoryDto);
         log.info("Категория {} id={} изменена.", category.getName(), category.getId());
         return category;

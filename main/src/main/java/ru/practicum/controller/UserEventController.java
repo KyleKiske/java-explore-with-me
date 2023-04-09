@@ -14,6 +14,7 @@ import ru.practicum.dto.notDto.UpdateEventRequest;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.service.UserEventService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -44,7 +45,7 @@ public class UserEventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto addNewEvent(@PathVariable long userId,
-                                    @RequestBody NewEventDto event) {
+                                    @RequestBody @Valid NewEventDto event) {
         EventFullDto eventAdded = userEventService.addEvent(userId, event);
         log.info("Создано новое событие");
         return eventAdded;

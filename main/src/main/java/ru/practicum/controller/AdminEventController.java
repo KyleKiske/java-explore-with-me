@@ -11,6 +11,7 @@ import ru.practicum.dto.notDto.UpdateEventRequest;
 import ru.practicum.model.State;
 import ru.practicum.service.AdminEventService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
@@ -49,7 +50,7 @@ public class AdminEventController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto redactEventById(@PathVariable long eventId,
-                                 @RequestBody UpdateEventRequest updateEvent) {
+                                 @RequestBody @Valid UpdateEventRequest updateEvent) {
         EventFullDto eventFullDto = adminEventService.redactEventInfo(eventId, updateEvent);
         log.info("Событие {} было изменено администратором", eventId);
         return eventFullDto;

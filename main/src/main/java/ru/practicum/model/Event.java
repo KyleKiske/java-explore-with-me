@@ -25,7 +25,9 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
+    @Column(name = "location_lat")
     private float locationLat;
+    @Column(name = "location_lon")
     private float locationLon;
     private Boolean paid;
     private Integer participantLimit;
