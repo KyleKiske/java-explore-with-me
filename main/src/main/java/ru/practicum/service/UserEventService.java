@@ -151,20 +151,39 @@ public class UserEventService {
         if (updateRequest.getRequestIds().isEmpty()) {
             return new EventRequestStatusUpdateResult();
         }
-        List<Request> requests = requestRepository.findAllById(updateRequest.getRequestIds());
-        for (Request req: requests) {
-            req.setStatus(updateRequest.getStatus());
+        List<Request> requests = requestRepository.findByIdIn(updateRequest.getRequestIds());
+        if (event.getRequestModeration().equals(false) || event.getParticipantLimit() == 0L) {
+            return new EventRequestStatusUpdateResult();
         }
-        requestRepository.saveAll(requests);
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
-        for (Request request: requests) {
-            if (request.getStatus() == RequestStatus.CONFIRMED) {
-                ParticipationRequestDto request1 = requestMapper.requestToDto(request);
-                updateResult.getConfirmedRequests().add(request1);
-            } else if (request.getStatus() == RequestStatus.REJECTED) {
-                updateResult.getRejectedRequests().add(requestMapper.requestToDto(request));
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+        List<ParticipationRequestDto> approvedRequests = new ArrayList<>();
+        for (int i = 0; i < requests.size(); i++) {
+            if (!requests.get(i).getStatus().equals(RequestStatus.PENDING)) {
+                throw new RequestValidationException("Can't change status of canceled or published requests.");
+            }
+            if (updateRequest.getStatus().equals(RequestStatus.REJECTED)) {
+                requests.get(i).setStatus(RequestStatus.REJECTED);
+                rejectedRequests.add(requestMapper.requestToDto(requests.get(i)));
+            } else {
+                if (event.getParticipantLimit() != 0 &&
+                        event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+                    throw new RequestValidationException("Request cannot be approved since participation limit.");
+                }
+                requests.get(i).setStatus(RequestStatus.CONFIRMED);
+                approvedRequests.add(requestMapper.requestToDto(requests.get(i)));
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                if (event.getConfirmedRequests().equals(event.getParticipantLimit()) && i != requests.size() - 1) {
+                    for (int j = i + 1; j < requests.size(); j++) {
+                        requests.get(j).setStatus(RequestStatus.REJECTED);
+                        rejectedRequests.add(requestMapper.requestToDto(requests.get(j)));
+                    }
+                    break;
+                }
             }
         }
+        updateResult.setRejectedRequests(rejectedRequests);
+        updateResult.setConfirmedRequests(approvedRequests);
         return updateResult;
     }
 }
