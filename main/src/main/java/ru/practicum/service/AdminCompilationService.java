@@ -9,6 +9,7 @@ import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.notDto.UpdateCompilationRequest;
 import ru.practicum.exception.CompilationNotFoundException;
+import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.CompEvent;
@@ -21,10 +22,7 @@ import ru.practicum.repository.EventRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,8 +41,17 @@ public class AdminCompilationService {
     @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.newCompilationToCompilation(newCompilationDto);
-        compilation = compilationRepository.save(compilation);
+        List<Event> eventList = eventRepository.findAllById(newCompilationDto.getEvents());
+        List<Long> eventResultList = eventList.stream().map(Event::getId).collect(Collectors.toList());
+        List<Long> eventForRemove = eventList.stream().map(Event::getId).collect(Collectors.toList());
+        List<Long> compilationEventIds = newCompilationDto.getEvents();
+        compilationEventIds.removeAll(eventForRemove);
+        if (compilationEventIds.size() != 0) {
+            throw new EventNotFoundException(compilationEventIds.get(0).toString());
+        }
+        newCompilationDto.setEvents(eventResultList);
 
+        compilation = compilationRepository.save(compilation);
         for (Long eventId: newCompilationDto.getEvents()) {
             CompEvent compEvent = new CompEvent();
             compEvent.setEventId(eventId);
@@ -57,8 +64,6 @@ public class AdminCompilationService {
             compilationDto.setEvents(List.of());
             return compilationDto;
         }
-        List<Event> eventList = eventRepository.findAllById(newCompilationDto.getEvents());
-
         List<EventShortDto> eventShortDtoList = eventList.stream()
                 .map(eventMapper::eventToShortDto).collect(Collectors.toList());
         List<String> uris = new ArrayList<>();
@@ -92,6 +97,17 @@ public class AdminCompilationService {
         CompilationDto compilationDto = compilationMapper.compilationToCompilationDto(compilation);
         List<Event> eventList;
         if (updateCompilationDto.getEvents() != null && !updateCompilationDto.getEvents().isEmpty())  {
+            eventList = eventRepository.findAllById(updateCompilationDto.getEvents());
+            List<Long> eventResultList = eventList.stream().map(Event::getId).collect(Collectors.toList());
+            List<Long> eventForRemove = eventList.stream().map(Event::getId).collect(Collectors.toList());
+            List<Long> compilationEventIds = updateCompilationDto.getEvents();
+            compilationEventIds.removeAll(eventForRemove);
+            if (compilationEventIds.size() != 0) {
+                throw new EventNotFoundException(compilationEventIds.get(0).toString());
+            }
+            updateCompilationDto.setEvents(eventResultList);
+            compilation = compilationRepository.save(compilation);
+
             compEventRepository.deleteByCompilationId(compilation.getId());
             for (Long eventId: updateCompilationDto.getEvents()) {
                 CompEvent compEvent = new CompEvent();
