@@ -14,8 +14,11 @@ public class CompilationMapper {
             return null;
         }
         Compilation compilation = new Compilation();
-
-        compilation.setPinned(newCompilationDto.getPinned());
+        if (newCompilationDto.getPinned() == null) {
+            compilation.setPinned(false);
+        } else {
+            compilation.setPinned(newCompilationDto.getPinned());
+        }
         compilation.setTitle(newCompilationDto.getTitle());
 
         return compilation;

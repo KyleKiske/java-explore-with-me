@@ -41,16 +41,20 @@ public class AdminCompilationService {
     @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.newCompilationToCompilation(newCompilationDto);
-        List<Event> eventList = eventRepository.findAllById(newCompilationDto.getEvents());
-        List<Long> eventResultList = eventList.stream().map(Event::getId).collect(Collectors.toList());
-        List<Long> eventForRemove = eventList.stream().map(Event::getId).collect(Collectors.toList());
-        List<Long> compilationEventIds = newCompilationDto.getEvents();
-        compilationEventIds.removeAll(eventForRemove);
-        if (compilationEventIds.size() != 0) {
-            throw new EventNotFoundException(compilationEventIds.get(0).toString());
+        List<Event> eventList = new ArrayList<>();
+        if (newCompilationDto.getEvents() == null) {
+            newCompilationDto.setEvents(List.of());
+        } else {
+            eventList = eventRepository.findAllById(newCompilationDto.getEvents());
+            List<Long> eventResultList = eventList.stream().map(Event::getId).collect(Collectors.toList());
+            List<Long> eventForRemove = eventList.stream().map(Event::getId).collect(Collectors.toList());
+            List<Long> compilationEventIds = newCompilationDto.getEvents();
+            compilationEventIds.removeAll(eventForRemove);
+            if (compilationEventIds.size() != 0) {
+                throw new EventNotFoundException(compilationEventIds.get(0).toString());
+            }
+            newCompilationDto.setEvents(eventResultList);
         }
-        newCompilationDto.setEvents(eventResultList);
-
         compilation = compilationRepository.save(compilation);
         for (Long eventId: newCompilationDto.getEvents()) {
             CompEvent compEvent = new CompEvent();
@@ -96,7 +100,8 @@ public class AdminCompilationService {
                 .orElseThrow(() -> new CompilationNotFoundException(compId.toString()));
         CompilationDto compilationDto = compilationMapper.compilationToCompilationDto(compilation);
         List<Event> eventList;
-        if (updateCompilationDto.getEvents() != null && !updateCompilationDto.getEvents().isEmpty())  {
+
+        if (updateCompilationDto.getEvents() != null)  {
             eventList = eventRepository.findAllById(updateCompilationDto.getEvents());
             List<Long> eventResultList = eventList.stream().map(Event::getId).collect(Collectors.toList());
             List<Long> eventForRemove = eventList.stream().map(Event::getId).collect(Collectors.toList());
