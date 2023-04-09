@@ -10,6 +10,7 @@ import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.NewEventDto;
 import ru.practicum.dto.notDto.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.notDto.EventRequestStatusUpdateResult;
+import ru.practicum.dto.notDto.StateAction;
 import ru.practicum.dto.notDto.UpdateEventRequest;
 import ru.practicum.exception.*;
 import ru.practicum.mapper.EventMapper;
@@ -110,6 +111,13 @@ public class UserEventService {
         }
         if (updateEvent.getEventDate() != null && updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new TimeRestrictionException("incorrect event date.");
+        }
+        if (updateEvent.getStateAction() != null) {
+            if (updateEvent.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
+                event.setState(State.PENDING);
+            } else {
+                event.setState(State.CANCELED);
+            }
         }
         event = eventMapper.updateEventAdminToEvent(event, updateEvent);
         eventRepository.save(event);
