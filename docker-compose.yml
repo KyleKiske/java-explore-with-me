@@ -33,7 +33,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/stats
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
 
   ewm-db:
     image: postgres:14-alpine
@@ -41,6 +41,6 @@ services:
     ports:
       - "8888:5432"
     environment:
-      - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=explore

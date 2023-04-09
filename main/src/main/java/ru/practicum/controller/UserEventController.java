@@ -81,8 +81,8 @@ public class UserEventController {
     @PatchMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult redactRequestsForEventById(
-                                    @PathVariable long userId,
-                                    @PathVariable long eventId,
+                                    @PathVariable Long userId,
+                                    @PathVariable Long eventId,
                                     @RequestBody EventRequestStatusUpdateRequest updateRequest) {
         EventRequestStatusUpdateResult updateResult = userEventService.redactRequestsStatus(userId, eventId, updateRequest);
         log.info("Изменен статус заявок на участие в событии {}", eventId);

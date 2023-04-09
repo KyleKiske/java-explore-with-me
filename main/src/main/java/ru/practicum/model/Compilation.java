@@ -5,8 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -19,6 +17,4 @@ public class Compilation {
     private Long id;
     private Boolean pinned;
     private String title;
-    @ManyToMany(mappedBy = "compilationsWithEvent")
-    private List<Event> eventsInCompilations;
 }

@@ -19,34 +19,45 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE E.initiator.id IN :users AND " +
             "E.state IN :states AND " +
             "E.category.id IN :categories AND " +
-            "E.eventDate BETWEEN :start AND :end " +
+            "E.eventDate BETWEEN :start AND :end AND " +
+            "E.id BETWEEN :from AND :size " +
             "ORDER BY E.id")
     List<Event> findFilteredEventsAdmin(@Param("users") List<Long> users,
-                                        @Param("states") List<String> states,
+                                        @Param("states") List<State> states,
                                         @Param("categories") List<Long> categories,
                                         @Param("start") LocalDateTime rangeStart,
                                         @Param("end") LocalDateTime rangeEnd,
-                                        Pageable pageable);
+                                        @Param("from") Long from,
+                                        @Param("size") Long size);
 
 
-    @Query(value = "SELECT E FROM Event AS E " +
-            "LEFT JOIN Category AS C on E.category.id = C.id " +
-            "WHERE (upper(E.annotation) LIKE upper(concat('%', :text, '%')) OR " +
-            "upper(E.description) like upper(concat('%', :text, '%')) ) AND " +
-            "E.category.id in :categories AND " +
-            "E.paid = :paid AND " +
-            "E.eventDate BETWEEN :start AND :end AND " +
-            "E.state = :state AND " +
-            "(E.confirmedRequests < E.participantLimit OR " +
-            "E.participantLimit <> 0) " +
-            "ORDER BY E.id")
-    List<Event> findPublicAvailable(@Param("text") String text,
-                                    @Param("categories") List<Long> categories,
-                                    @Param("paid") Boolean paid,
-                                    @Param("start") LocalDateTime rangeStart,
-                                    @Param("end") LocalDateTime rangeEnd,
-                                    @Param("state") State state,
-                                    Pageable pageable);
+    @Query(value = "SELECT e from Event e " +
+            "LEFT JOIN Category c ON e.category.id = c.id " +
+            "WHERE (UPPER(e.annotation) LIKE UPPER(concat('%', ?1, '%')) OR " +
+            "UPPER(e.description) LIKE UPPER(concat('%', ?1, '%')) ) AND " +
+            "e.category.id IN ?2 AND " +
+            "e.paid = ?3 AND " +
+            "e.eventDate BETWEEN ?4 AND ?5 AND " +
+            "e.state = ?6 AND " +
+            "e.id BETWEEN ?7 AND ?8 AND " +
+            "(e.confirmedRequests < e.participantLimit OR " +
+            "e.participantLimit <> 0) " +
+            "GROUP BY e.id")
+    List<Event> findPublicAvailable(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                      LocalDateTime rangeEnd, State state, Long from, Long size);
+
+    @Query(value = "SELECT e from Event e " +
+            "LEFT JOIN Category c ON e.category.id = c.id " +
+            "WHERE (UPPER(e.annotation) LIKE UPPER(concat('%', ?1, '%')) OR " +
+            "UPPER(e.description) LIKE UPPER(concat('%', ?1, '%')) ) AND " +
+            "e.category.id IN ?2 AND " +
+            "e.paid = ?3 AND " +
+            "e.eventDate BETWEEN ?4 AND ?5 AND " +
+            "e.state = ?6 AND " +
+            "e.id BETWEEN ?7 AND ?8 " +
+            "GROUP BY e.id")
+    List<Event> findPublicNotAvailable(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                       LocalDateTime rangeEnd, State state, Long from, Long size);
 
     List<Event> findByAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdInAndPaidAndEventDateBetweenAndState(
             String text1,

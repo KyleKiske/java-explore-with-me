@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS events
     location_lon  REAL  NOT NULL,
     location_lat  REAL  NOT NULL,
     paid BOOLEAN,
-    participant_limit INTEGER NOT NULL,
+    participant_limit BIGINT NOT NULL,
     published_on TIMESTAMP,
     request_moderation BOOLEAN,
     state VARCHAR(256) NOT NULL,
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS requests
 
 CREATE TABLE IF NOT EXISTS events_compilations
 (
-    event_id INTEGER NOT NULL,
-    compilation_id INTEGER NOT NULL,
+    event_id BIGINT NOT NULL,
+    compilation_id BIGINT NOT NULL,
     FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
     FOREIGN KEY (compilation_id) REFERENCES compilations (id) ON DELETE CASCADE
 );

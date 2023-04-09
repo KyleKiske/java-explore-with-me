@@ -2,7 +2,6 @@ package ru.practicum.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.model.Event;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

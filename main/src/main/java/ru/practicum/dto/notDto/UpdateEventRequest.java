@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.model.Location;
-import ru.practicum.model.State;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

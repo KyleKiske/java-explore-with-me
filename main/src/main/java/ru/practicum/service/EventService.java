@@ -2,16 +2,13 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.PaginationMaker;
 import ru.practicum.StatClient;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
 import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.mapper.EventMapper;
-import ru.practicum.model.EndpointHitDto;
-import ru.practicum.model.Event;
-import ru.practicum.model.ResponseStatsDto;
-import ru.practicum.model.State;
+import ru.practicum.model.*;
+import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
 
 import java.time.LocalDateTime;
@@ -24,6 +21,7 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
     private final StatClient statClient;
     static final String URI = "/events/";
@@ -33,35 +31,51 @@ public class EventService {
     public List<EventShortDto> getFilteredEvents(String text,
                                                  List<Long> categories,
                                                  Boolean paid,
-                                                 String rangeStart,
-                                                 String rangeEnd,
+                                                 LocalDateTime rangeStart,
+                                                 LocalDateTime rangeEnd,
                                                  Boolean onlyAvailable,
                                                  String sort,
-                                                 Integer from,
-                                                 Integer size,
+                                                 Long from,
+                                                 Long size,
                                                  String ip) {
-        LocalDateTime startDateTime = LocalDateTime.now();
-        LocalDateTime endDateTime = LocalDateTime.now().plusYears(8);
-        List<Event> eventList;
+        List<Event> eventList = new ArrayList<>();
 
         if (text == null || text.isBlank()) {
             text = "";
         }
         if (categories == null || categories.isEmpty()) {
-            categories = List.of();
+            List<Category> categoryList = categoryRepository.findAll();
+            categories = new ArrayList<>();
+            for (Category category: categoryList) {
+                categories.add(category.getId());
+            }
         }
-        if (rangeStart != null) {
-            startDateTime = LocalDateTime.parse(rangeStart, dateTimeFormatter);
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now().minusYears(5);
         }
-        if (rangeEnd != null) {
-            endDateTime = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
+        if (rangeEnd == null) {
+            rangeEnd = LocalDateTime.now().plusYears(5);
         }
+
+        size = from + size - 1;
+        System.out.println(text);
+        System.out.println(categories);
+        System.out.println(paid);
+        System.out.println(rangeStart);
+        System.out.println(rangeEnd);
+        System.out.println(onlyAvailable);
+        System.out.println(from);
+        System.out.println(size);
         if (!onlyAvailable) {
-            eventList = eventRepository.findByAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategory_IdInAndPaidAndEventDateBetweenAndState(
-                    text, text, categories, paid, startDateTime, endDateTime, State.PUBLISHED, PaginationMaker.makePageRequest(from, size));
+            eventList = eventRepository.findPublicNotAvailable(
+                    text, categories, paid, rangeStart, rangeEnd, State.PUBLISHED, from, size);
         } else {
-            eventList = eventRepository.findPublicAvailable(text, categories, paid, startDateTime, endDateTime, State.PUBLISHED,
-                    PaginationMaker.makePageRequest(from, size));
+            eventList = eventRepository.findPublicAvailable(text, categories, paid, rangeStart,
+                    rangeEnd, State.PUBLISHED, from, size);
+        }
+        System.out.println("list size = " + eventList.size());
+        if (eventList.isEmpty()) {
+            return List.of();
         }
         List<EventShortDto> eventShortDtoList = eventList.stream().map(eventMapper::eventToShortDto)
                 .collect(Collectors.toList());

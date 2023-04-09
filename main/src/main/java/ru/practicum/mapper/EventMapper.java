@@ -1,6 +1,5 @@
 package ru.practicum.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
@@ -15,7 +14,7 @@ public class EventMapper {
     private final UserMapper userMapper = new UserMapper();
 
     public EventShortDto eventToShortDto(Event event) {
-        if (event == null){
+        if (event == null) {
             return null;
         }
         EventShortDto eventShortDto = new EventShortDto();
@@ -34,7 +33,7 @@ public class EventMapper {
     }
 
     public EventFullDto eventToFullDto(Event event) {
-        if (event == null){
+        if (event == null) {
             return null;
         }
         EventFullDto eventFullDto = new EventFullDto();
@@ -89,7 +88,7 @@ public class EventMapper {
     }
 
     public Event newEventToEvent(NewEventDto newEventDto) {
-        if (newEventDto == null){
+        if (newEventDto == null) {
             return null;
         }
         Event event = new Event();

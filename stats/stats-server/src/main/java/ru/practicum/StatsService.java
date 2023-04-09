@@ -22,6 +22,15 @@ public class StatsService {
     }
 
     public List<ResponseStatsDto> getStat(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (uris != null) {
+            for (int i = 0; i < uris.size(); i++) {
+                if (uris.get(i).contains("[")) {
+                    String replacement = uris.get(i);
+                    replacement = replacement.replaceAll("\\[", "").replaceAll("]", "");
+                    uris.set(i, replacement);
+                }
+            }
+        }
         if (uris != null && !uris.isEmpty()) {
             if (unique) {
                 return statsRepository.findAllHitsFromUniqueIPs(start, end, uris);

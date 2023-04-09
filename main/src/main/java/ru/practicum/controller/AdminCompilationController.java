@@ -3,13 +3,11 @@ package ru.practicum.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.notDto.UpdateCompilationRequest;
-import ru.practicum.model.Category;
 import ru.practicum.service.AdminCompilationService;
 
 @Slf4j
@@ -30,6 +28,7 @@ public class AdminCompilationController {
     }
 
     @DeleteMapping("/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilationById(@PathVariable long compId) {
         adminCompilationService.deleteCompilation(compId);
         log.info("Подборка {} удалена.", compId);

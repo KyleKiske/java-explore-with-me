@@ -2,7 +2,6 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.PaginationMaker;
@@ -25,7 +24,7 @@ public class AdminUserService {
     private final UserMapper userMapper;
 
     public List<User> getFilteredUsers(List<Long> ids, Integer from, Integer size) {
-        if (ids != null && !ids.isEmpty()){
+        if (ids != null && !ids.isEmpty()) {
             return userRepository.findAllById(ids);
         } else {
             return userRepository.findAll(PaginationMaker.makePageRequest(from, size)).getContent();
@@ -35,7 +34,7 @@ public class AdminUserService {
     @Transactional
     public User createUser(NewUserRequest newUserRequest) {
         User user = userMapper.newUserToUser(newUserRequest);
-        if (userRepository.existsByEmail(user.getEmail())){
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new DuplicateEmailException("Email already exists");
         }
         return userRepository.save(user);

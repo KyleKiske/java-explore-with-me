@@ -2,9 +2,7 @@ package ru.practicum.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.dto.CompilationDto;
-import ru.practicum.dto.NewCategoryDto;
 import ru.practicum.dto.NewCompilationDto;
-import ru.practicum.model.Category;
 import ru.practicum.model.Compilation;
 
 @Component

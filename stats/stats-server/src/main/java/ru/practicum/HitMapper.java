@@ -1,11 +1,10 @@
 package ru.practicum;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 import ru.practicum.model.EndpointHitDto;
 
-@Component
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HitMapper {
 
     public static EndpointHit endpointHitDtoToEndpointHit(EndpointHitDto endpointHitDto) {

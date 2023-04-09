@@ -42,25 +42,18 @@ public class UserEventService {
     static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<EventShortDto> getEventsAddedByUser(long userId, Integer from, Integer size) {
-        List <EventShortDto> dtoList = eventRepository
+        List<EventShortDto> dtoList = eventRepository
                 .findAllByInitiatorId(userId, PaginationMaker.makePageRequest(from, size))
                 .stream().map(eventMapper::eventToShortDto).collect(Collectors.toList());
         List<String> uris = new ArrayList<>();
         for (EventShortDto event: dtoList) {
             uris.add(URI + event.getId());
         }
-        System.out.println("AMOGUS 3");
-        System.out.println(uris);
-        System.out.println(uris.size());
-        System.out.println(uris.get(0));
         List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
                 LocalDateTime.now().plusYears(10).format(dateTimeFormatter), uris, false);
-        System.out.println("STAT SIZE");
-        System.out.println(stats.size());
         Map<Long, Long> hits = new HashMap<>();
         for (ResponseStatsDto responseStatsDto: stats) {
             Long id = Long.parseLong(responseStatsDto.getUri().split("/")[2]);
-            System.out.println(responseStatsDto.getUri());
             hits.put(id, responseStatsDto.getHits());
         }
         for (EventShortDto eventShortDto: dtoList) {
@@ -93,17 +86,10 @@ public class UserEventService {
             throw new EventNotFoundException(eventId.toString());
         }
         String fullUri = URI + eventId;
-        System.out.println("AMOGUS");
-        System.out.println(fullUri);
-        List<ResponseStatsDto> stats = statClient.get(LocalDateTime.now().minusYears(10).format(dateTimeFormatter),
-                LocalDateTime.now().plusYears(10).format(dateTimeFormatter), List.of(fullUri), false);
-        System.out.println(stats.size());
-        for (ResponseStatsDto statsDto: stats) {
-            System.out.println("AMOGUS2");
-            System.out.println(statsDto.getHits());
-            System.out.println(statsDto.getUri());
-            System.out.println(statsDto.getApp());
-        }
+        String start = LocalDateTime.now().minusYears(10).format(dateTimeFormatter);
+        String end = LocalDateTime.now().plusYears(10).format(dateTimeFormatter);
+        List<ResponseStatsDto> stats = statClient.get(start,
+                end, List.of(fullUri), false);
         EventFullDto result = eventMapper.eventToFullDto(event);
         if (stats.isEmpty()) {
             result.setViews(0L);
@@ -164,8 +150,9 @@ public class UserEventService {
         requestRepository.saveAll(requests);
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
         for (Request request: requests) {
-            if (request.getStatus() == RequestStatus.APPROVED) {
-                updateResult.getConfirmedRequests().add(requestMapper.requestToDto(request));
+            if (request.getStatus() == RequestStatus.CONFIRMED) {
+                ParticipationRequestDto request1 = requestMapper.requestToDto(request);
+                updateResult.getConfirmedRequests().add(request1);
             } else if (request.getStatus() == RequestStatus.REJECTED) {
                 updateResult.getRejectedRequests().add(requestMapper.requestToDto(request));
             }

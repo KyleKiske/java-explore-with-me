@@ -3,7 +3,6 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.PaginationMaker;
 import ru.practicum.StatClient;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.notDto.StateAction;
@@ -13,12 +12,10 @@ import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.exception.EventPublishingException;
 import ru.practicum.exception.TimeRestrictionException;
 import ru.practicum.mapper.EventMapper;
-import ru.practicum.model.Category;
-import ru.practicum.model.Event;
-import ru.practicum.model.ResponseStatsDto;
-import ru.practicum.model.State;
+import ru.practicum.model.*;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,38 +32,52 @@ public class AdminEventService {
 
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final StatClient statClient;
     static final String URI = "/events/";
     static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<EventFullDto> getFilteredEvents(List<Long> users,
-                                                List<String> states,
+                                                List<State> states,
                                                 List<Long> categories,
-                                                String rangeStart,
-                                                String rangeEnd,
-                                                Integer from,
-                                                Integer size) {
-        LocalDateTime startDateTime = LocalDateTime.now();
-        LocalDateTime endDateTime = LocalDateTime.now().plusYears(8);
+                                                LocalDateTime rangeStart,
+                                                LocalDateTime rangeEnd,
+                                                Long from,
+                                                Long size) {
         if (users == null) {
+            List<User> userList = userRepository.findAll();
             users = new ArrayList<>();
+            for (User user: userList) {
+                users.add(user.getId());
+            }
         }
         if (states == null) {
             states = new ArrayList<>();
+            states.add(State.PUBLISHED);
+            states.add(State.CANCELED);
+            states.add(State.PENDING);
         }
         if (categories == null) {
+            List<Category> categoryList = categoryRepository.findAll();
             categories = new ArrayList<>();
+            for (Category category: categoryList) {
+                categories.add(category.getId());
+            }
         }
-        if (rangeStart != null) {
-            startDateTime = LocalDateTime.parse(rangeStart, dateTimeFormatter);
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now();
         }
-        if (rangeEnd != null) {
-            endDateTime = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
+        if (rangeEnd == null) {
+            rangeEnd = LocalDateTime.now().plusYears(5);
         }
-        List<Event> eventList = eventRepository.findFilteredEventsAdmin(users, states, categories, startDateTime, endDateTime,
-                PaginationMaker.makePageRequest(from, size));
-        List<EventFullDto> fullDtoList =  eventList.stream().map(eventMapper::eventToFullDto)
+        size = from + size - 1;
+        List<Event> eventList = eventRepository.findFilteredEventsAdmin(users, states, categories,
+                rangeStart, rangeEnd, from, size);
+        if (eventList.isEmpty()) {
+            return List.of();
+        }
+        List<EventFullDto> fullDtoList = eventList.stream().map(eventMapper::eventToFullDto)
                 .collect(Collectors.toList());
         List<String> uris = new ArrayList<>();
         for (EventFullDto event: fullDtoList) {

@@ -17,7 +17,7 @@ import java.util.Objects;
 @Service
 public class StatClient {
 
-    private final RestTemplate rest;
+    protected final RestTemplate rest;
     private final String serverUrl;
 
     public StatClient(@Value("${stats-server.url}") String serverUrl, RestTemplate rest) {
@@ -43,9 +43,16 @@ public class StatClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<Object> response = rest
-                .exchange(serverUrl + "/stats?start={start}&end={end}&uris={uris}&unique={unique}",
-                        HttpMethod.GET, requestEntity, Object.class, parameters);
+        ResponseEntity<Object> response;
+        if (parameters.get("uris") != null) {
+            response = rest
+                    .exchange(serverUrl + "/stats?start={start}&end={end}&uris={uris}&unique={unique}",
+                            HttpMethod.GET, requestEntity, Object.class, parameters);
+        } else {
+            response = rest
+                    .exchange(serverUrl + "/stats?start={start}&end={end}&unique={unique}",
+                            HttpMethod.GET, requestEntity, Object.class, parameters);
+        }
         List<ResponseStatsDto> result = objectMapper.convertValue(response.getBody(), new TypeReference<>(){});
         return Objects.requireNonNullElseGet(result, List::of);
     }
