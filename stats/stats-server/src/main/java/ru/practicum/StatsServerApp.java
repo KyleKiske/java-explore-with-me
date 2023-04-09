@@ -12,7 +12,6 @@ public class StatsServerApp {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
-
     }
 
     public static void main(String[] args) {
