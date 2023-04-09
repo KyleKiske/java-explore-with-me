@@ -97,6 +97,16 @@ public class ErrorHandler {
                 LocalDateTime.now().format(dateTimeFormatter));
     }
 
+    @ExceptionHandler(DuplicateCategoryException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleDuplicateEmail(final DuplicateCategoryException e) {
+        log.error("409 {}", e.getMessage(), e);
+        return new ApiError(HttpStatus.CONFLICT.toString(),
+                "Category with that name already exists.",
+                e.getMessage(),
+                LocalDateTime.now().format(dateTimeFormatter));
+    }
+
     @ExceptionHandler(TimeRestrictionException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleTimeRestrictionException(final TimeRestrictionException e) {
