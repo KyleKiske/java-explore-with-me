@@ -17,12 +17,10 @@ public class UpdateEventRequest {
     @Size(min = 20, message = "Минимальная длина краткого описания - 20 символов")
     @Size(max = 2000, message = "Максимальная длина краткого описания - 2000 символов")
     private String annotation;
-    @NotNull
     private Long category;
     @Size(min = 20, message = "Минимальная длина описания - 20 символов")
     @Size(max = 7000, message = "Максимальная длина описания - 7000 символов")
     private String description;
-    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private Location location;
