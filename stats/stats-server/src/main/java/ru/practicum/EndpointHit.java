@@ -1,15 +1,13 @@
-package ru.practicum.model;
+package ru.practicum;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "stats", schema = "public")
 public class EndpointHit {
