@@ -2,7 +2,6 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatClient;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.EventShortDto;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AdminCompilationService {
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
@@ -35,10 +33,9 @@ public class AdminCompilationService {
     private final EventRepository eventRepository;
     private final CompEventRepository compEventRepository;
     private final StatClient statClient;
-    static final String URI = "/events/";
-    static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String URI = "/events/";
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.newCompilationToCompilation(newCompilationDto);
         List<Event> eventList = new ArrayList<>();
@@ -56,12 +53,14 @@ public class AdminCompilationService {
             newCompilationDto.setEvents(eventResultList);
         }
         compilation = compilationRepository.save(compilation);
+        List<CompEvent> compEventList = new ArrayList<>();
         for (Long eventId: newCompilationDto.getEvents()) {
             CompEvent compEvent = new CompEvent();
             compEvent.setEventId(eventId);
             compEvent.setCompilationId(compilation.getId());
-            compEventRepository.save(compEvent);
+            compEventList.add(compEvent);
         }
+        compEventRepository.saveAll(compEventList);
 
         CompilationDto compilationDto = compilationMapper.compilationToCompilationDto(compilation);
         if (newCompilationDto.getEvents() == null || newCompilationDto.getEvents().isEmpty()) {
@@ -88,13 +87,11 @@ public class AdminCompilationService {
         return compilationDto;
     }
 
-    @Transactional
     public void deleteCompilation(Long compId) {
         compilationRepository.findById(compId).orElseThrow(() -> new CompilationNotFoundException(compId.toString()));
         compilationRepository.deleteById(compId);
     }
 
-    @Transactional
     public CompilationDto redactCompilation(Long compId, UpdateCompilationRequest updateCompilationDto) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new CompilationNotFoundException(compId.toString()));
@@ -114,12 +111,14 @@ public class AdminCompilationService {
             compilation = compilationRepository.save(compilation);
 
             compEventRepository.deleteByCompilationId(compilation.getId());
+            List<CompEvent> compEventList = new ArrayList<>();
             for (Long eventId: updateCompilationDto.getEvents()) {
                 CompEvent compEvent = new CompEvent();
                 compEvent.setEventId(eventId);
                 compEvent.setCompilationId(compilation.getId());
-                compEventRepository.save(compEvent);
+                compEventList.add(compEvent);
             }
+            compEventRepository.saveAll(compEventList);
             eventList = eventRepository.findAllById(updateCompilationDto.getEvents());
         } else {
             eventList = eventRepository.findAllById(compEventRepository.findEventIdsByCompilationId(compilation.getId()));

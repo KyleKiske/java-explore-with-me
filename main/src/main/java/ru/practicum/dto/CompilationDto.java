@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 public class CompilationDto {
-    private List<EventShortDto> events;
     @NotNull
     private Long id;
     private Boolean pinned;
     @NotBlank
     private String title;
+    private List<EventShortDto> events;
 }

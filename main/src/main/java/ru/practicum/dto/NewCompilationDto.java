@@ -9,8 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 public class NewCompilationDto {
-    private List<Long> events;
-    private Boolean pinned;
     @NotBlank(message = "Field: title. Error: Field must not be blank.")
     private String title;
+    private Boolean pinned;
+    private List<Long> events;
 }

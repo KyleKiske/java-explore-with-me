@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.PaginationMaker;
 import ru.practicum.StatClient;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
@@ -35,10 +36,10 @@ public class EventService {
                                                  LocalDateTime rangeEnd,
                                                  Boolean onlyAvailable,
                                                  String sort,
-                                                 Long from,
-                                                 Long size,
+                                                 Integer from,
+                                                 Integer size,
                                                  String ip) {
-        List<Event> eventList = new ArrayList<>();
+        List<Event> eventList;
 
         if (text == null || text.isBlank()) {
             text = "";
@@ -57,13 +58,12 @@ public class EventService {
             rangeEnd = LocalDateTime.now().plusYears(5);
         }
 
-        size = from + size - 1;
         if (!onlyAvailable) {
-            eventList = eventRepository.findPublicNotAvailable(
-                    text, categories, paid, rangeStart, rangeEnd, State.PUBLISHED, from, size);
+            eventList = eventRepository.findPublicNotAvailable(text, categories, paid, rangeStart, rangeEnd,
+                    State.PUBLISHED, PaginationMaker.makePageRequest(from, size)).getContent();
         } else {
             eventList = eventRepository.findPublicAvailable(text, categories, paid, rangeStart,
-                    rangeEnd, State.PUBLISHED, from, size);
+                    rangeEnd, State.PUBLISHED, PaginationMaker.makePageRequest(from, size)).getContent();
         }
         if (eventList.isEmpty()) {
             return List.of();

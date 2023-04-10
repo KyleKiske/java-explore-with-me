@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserEventService {
 
     private final EventRepository eventRepository;
@@ -63,7 +62,6 @@ public class UserEventService {
         return dtoList;
     }
 
-    @Transactional
     public EventFullDto addEvent(Long userId, NewEventDto newEventDto) {
         Event event = eventMapper.newEventToEvent(newEventDto);
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
@@ -100,7 +98,6 @@ public class UserEventService {
         return result;
     }
 
-    @Transactional
     public EventFullDto redactEventById(long userId, Long eventId, UpdateEventRequest updateEvent) {
         Event event = eventRepository.findByInitiatorIdAndId(userId, eventId);
         if (event == null) {

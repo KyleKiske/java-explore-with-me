@@ -34,8 +34,8 @@ public class AdminEventController {
                 @RequestParam(required = false) List<Long> categories,
                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Long from,
-                @Positive @RequestParam(name = "size", defaultValue = "10") Long size) {
+                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         List<EventFullDto> response = adminEventService.getFilteredEvents(
                 users,
                 states,

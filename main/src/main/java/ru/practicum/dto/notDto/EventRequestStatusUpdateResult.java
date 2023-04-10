@@ -10,11 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class EventRequestStatusUpdateResult {
-    private List<ParticipationRequestDto> confirmedRequests;
-    private List<ParticipationRequestDto> rejectedRequests;
-
-    public EventRequestStatusUpdateResult() {
-        confirmedRequests = new ArrayList<>();
-        rejectedRequests = new ArrayList<>();
-    }
+    private List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+    private List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 }

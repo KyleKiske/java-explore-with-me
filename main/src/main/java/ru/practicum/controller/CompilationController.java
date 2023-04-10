@@ -25,8 +25,8 @@ public class CompilationController {
     @ResponseStatus(HttpStatus.OK)
     public List<CompilationDto> getFilteredCompilations(
                 @RequestParam(required = false) Boolean pinned,
-                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Long from,
-                @Positive @RequestParam(name = "size", defaultValue = "10") Long size) {
+                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         List<CompilationDto> response = compilationService.getFilteredCompilations(pinned, from, size);
         log.info("Получен список подборок");
         return response;

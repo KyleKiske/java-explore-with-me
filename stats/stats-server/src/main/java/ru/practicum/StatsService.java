@@ -2,7 +2,6 @@ package ru.practicum;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.model.EndpointHitDto;
 import ru.practicum.model.ResponseStatsDto;
 
@@ -11,12 +10,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class StatsService {
 
     private final StatsRepository statsRepository;
 
-    @Transactional
     public void createHit(EndpointHitDto endpointHitDto) {
         statsRepository.save(HitMapper.endpointHitDtoToEndpointHit(endpointHitDto));
     }

@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EventFullDto {
+    private Long id;
     @Size(min = 20, message = "Минимальная длина краткого описания - 20 символов")
     @Size(max = 2000, message = "Максимальная длина краткого описания - 2000 символов")
     private String annotation;
-    @NotNull
     private Category category;
     private Integer confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -30,7 +30,6 @@ public class EventFullDto {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private Long id;
     private UserShortDto initiator;
     private Location location;
     private Boolean paid;

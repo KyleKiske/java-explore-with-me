@@ -2,7 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.PaginationMaker;
 import ru.practicum.StatClient;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.notDto.StateAction;
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AdminEventService {
 
     private final EventRepository eventRepository;
@@ -35,16 +34,16 @@ public class AdminEventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final StatClient statClient;
-    static final String URI = "/events/";
-    static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String URI = "/events/";
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<EventFullDto> getFilteredEvents(List<Long> users,
                                                 List<State> states,
                                                 List<Long> categories,
                                                 LocalDateTime rangeStart,
                                                 LocalDateTime rangeEnd,
-                                                Long from,
-                                                Long size) {
+                                                Integer from,
+                                                Integer size) {
         if (users == null) {
             List<User> userList = userRepository.findAll();
             users = new ArrayList<>();
@@ -71,9 +70,8 @@ public class AdminEventService {
         if (rangeEnd == null) {
             rangeEnd = LocalDateTime.now().plusYears(5);
         }
-        size = from + size - 1;
         List<Event> eventList = eventRepository.findFilteredEventsAdmin(users, states, categories,
-                rangeStart, rangeEnd, from, size);
+                rangeStart, rangeEnd, PaginationMaker.makePageRequest(from, size)).getContent();
         if (eventList.isEmpty()) {
             return List.of();
         }
@@ -96,14 +94,12 @@ public class AdminEventService {
         return fullDtoList;
     }
 
-    @Transactional
     public EventFullDto redactEventInfo(Long eventId, UpdateEventRequest updateEvent) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId.toString()));
-        if (updateEvent.getEventDate() != null) {
-            if (updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-                throw new TimeRestrictionException("Field: eventDate. Error: incorrect event date.");
-            }
+        if (updateEvent.getEventDate() != null &&
+                            updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new TimeRestrictionException("Field: eventDate. Error: incorrect event date.");
         }
         if (updateEvent.getCategory() != null) {
             Category category = categoryRepository.findById(updateEvent.getCategory())

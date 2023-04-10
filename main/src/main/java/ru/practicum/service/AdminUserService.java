@@ -3,8 +3,8 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.PaginationMaker;
+import ru.practicum.dto.UserDto;
 import ru.practicum.dto.notDto.NewUserRequest;
 import ru.practicum.exception.DuplicateEmailException;
 import ru.practicum.exception.UserNotFoundException;
@@ -13,34 +13,35 @@ import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AdminUserService {
 
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
 
-    public List<User> getFilteredUsers(List<Long> ids, Integer from, Integer size) {
+    public List<UserDto> getFilteredUsers(List<Long> ids, Integer from, Integer size) {
+        List<User> userList;
         if (ids != null && !ids.isEmpty()) {
-            return userRepository.findAllById(ids);
+            userList = userRepository.findAllById(ids);
         } else {
-            return userRepository.findAll(PaginationMaker.makePageRequest(from, size)).getContent();
+            userList = userRepository.findAll(PaginationMaker.makePageRequest(from, size)).getContent();
         }
+        return userList.stream().map(userMapper::userToUserDto).collect(Collectors.toList());
     }
 
-    @Transactional
-    public User createUser(NewUserRequest newUserRequest) {
+    public UserDto createUser(NewUserRequest newUserRequest) {
         User user = userMapper.newUserToUser(newUserRequest);
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new DuplicateEmailException("Email already exists");
         }
-        return userRepository.save(user);
+        userRepository.save(user);
+        return userMapper.userToUserDto(user);
     }
 
-    @Transactional
     public void deleteUserById(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
         userRepository.deleteById(userId);

@@ -2,7 +2,6 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.exception.RequestValidationException;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserRequestService {
 
     private final EventRepository eventRepository;
@@ -33,7 +31,6 @@ public class UserRequestService {
         return requestList.stream().map(requestMapper::requestToDto).collect(Collectors.toList());
     }
 
-    @Transactional
     public ParticipationRequestDto addUserRequest(Long userId, Long eventId) {
         User requester = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId.toString()));
@@ -63,7 +60,6 @@ public class UserRequestService {
         return requestMapper.requestToDto(request);
     }
 
-    @Transactional
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
         Request request = requestRepository.findById(requestId)

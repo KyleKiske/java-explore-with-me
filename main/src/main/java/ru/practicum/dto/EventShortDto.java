@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class EventShortDto {
+    private Long id;
     @Size(min = 20, message = "Минимальная длина краткого описания - 20 символов")
     @Size(max = 2000, message = "Максимальная длина краткого описания - 2000 символов")
     private String annotation;
@@ -21,7 +22,6 @@ public class EventShortDto {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private Long id;
     private UserShortDto initiator;
     private Boolean paid;
     private String title;

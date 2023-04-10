@@ -1,6 +1,7 @@
 package ru.practicum.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.practicum.dto.UserDto;
 import ru.practicum.dto.UserShortDto;
 import ru.practicum.dto.notDto.NewUserRequest;
 import ru.practicum.model.User;
@@ -32,16 +33,16 @@ public class UserMapper {
         return userShortDto;
     }
 
-//    public UserDto userToUserDto(User user) {
-//        if (user == null){
-//            return null;
-//        }
-//        UserDto userDto = new UserDto();
-//
-//        userDto.setEmail(user.getEmail());
-//        userDto.setId(user.getId());
-//        userDto.setName(user.getName());
-//
-//        return userDto;
-//    }
+    public UserDto userToUserDto(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserDto userDto = new UserDto();
+
+        userDto.setEmail(user.getEmail());
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+
+        return userDto;
+    }
 }

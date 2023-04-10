@@ -35,8 +35,8 @@ public class EventController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) String sort,
-            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Long from,
-            @Positive @RequestParam(name = "size", defaultValue = "10") Long size,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
             HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         List<EventShortDto> response = eventService.getFilteredEvents(

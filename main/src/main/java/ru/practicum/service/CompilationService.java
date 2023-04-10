@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.PaginationMaker;
 import ru.practicum.StatClient;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.EventShortDto;
@@ -37,12 +38,12 @@ public class CompilationService {
     static final String URI = "/events/";
     static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public List<CompilationDto> getFilteredCompilations(Boolean pinned, Long from, Long size) {
+    public List<CompilationDto> getFilteredCompilations(Boolean pinned, Integer from, Integer size) {
         List<Compilation> compilations;
         if (pinned == null) {
-            compilations = compilationRepository.findAllByIdBetween(from, size);
+            compilations = compilationRepository.findAll(PaginationMaker.makePageRequest(from, size)).getContent();
         } else {
-            compilations = compilationRepository.findByPinnedAndIdBetween(pinned, from, size);
+            compilations = compilationRepository.findByPinned(pinned, PaginationMaker.makePageRequest(from, size)).getContent();
         }
         List<CompilationDto> compilationDtoList = new ArrayList<>();
         for (Compilation compilation: compilations) {

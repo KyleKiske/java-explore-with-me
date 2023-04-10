@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.NewCategoryDto;
-import ru.practicum.model.Category;
 import ru.practicum.service.AdminCategoryService;
 
 import javax.validation.Valid;
@@ -22,10 +22,10 @@ public class AdminCategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category createCategory(@RequestBody @Validated NewCategoryDto newCategoryDto) {
-        Category category = adminCategoryService.addCategory(newCategoryDto);
-        log.info("Создана категория {}", category.getName());
-        return category;
+    public CategoryDto createCategory(@RequestBody @Validated NewCategoryDto newCategoryDto) {
+        CategoryDto categoryDto = adminCategoryService.addCategory(newCategoryDto);
+        log.info("Создана категория {}", categoryDto.getName());
+        return categoryDto;
     }
 
     @DeleteMapping("/{catId}")
@@ -36,10 +36,10 @@ public class AdminCategoryController {
     }
 
     @PatchMapping("/{catId}")
-    public Category redactCategory(@PathVariable long catId,
+    public CategoryDto redactCategory(@PathVariable long catId,
                                    @RequestBody @Valid NewCategoryDto newCategoryDto) {
-        Category category = adminCategoryService.redactCategory(catId, newCategoryDto);
-        log.info("Категория {} id={} изменена.", category.getName(), category.getId());
-        return category;
+        CategoryDto categoryDto = adminCategoryService.redactCategory(catId, newCategoryDto);
+        log.info("Категория {} id={} изменена.", categoryDto.getName(), categoryDto.getId());
+        return categoryDto;
     }
 }

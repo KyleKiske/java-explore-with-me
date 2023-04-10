@@ -12,7 +12,6 @@ public interface CompEventRepository extends JpaRepository<CompEvent, Long> {
     void deleteByCompilationId(Long compilationId);
 
     @Query(value = "SELECT C.eventId from CompEvent AS C " +
-            "where C.compilationId = :compilationId " +
-            "group by C.eventId")
+            "where C.compilationId = :compilationId")
     List<Long> findEventIdsByCompilationId(@Param("compilationId") Long compilationId);
 }

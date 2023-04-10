@@ -9,8 +9,6 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "users", schema = "public")
-@AllArgsConstructor
-@NoArgsConstructor
 public class User {
     @Column(unique = true)
     private String email;

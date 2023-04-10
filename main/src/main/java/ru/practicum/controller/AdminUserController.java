@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.UserDto;
 import ru.practicum.dto.notDto.NewUserRequest;
-import ru.practicum.model.User;
 import ru.practicum.service.AdminUserService;
 
 import javax.validation.Valid;
@@ -24,18 +24,18 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @GetMapping
-    public List<User> getFilteredUsers(@RequestParam(required = false) List<Long> ids,
-                                       @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                       @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        List<User> result = adminUserService.getFilteredUsers(ids, from, size);
+    public List<UserDto> getFilteredUsers(@RequestParam(required = false) List<Long> ids,
+                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        List<UserDto> result = adminUserService.getFilteredUsers(ids, from, size);
         log.info("Создан список пользователей по запросу администратора");
         return result;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@Valid @RequestBody NewUserRequest newUserRequest) {
-        User user = adminUserService.createUser(newUserRequest);
+    public UserDto createUser(@Valid @RequestBody NewUserRequest newUserRequest) {
+        UserDto user = adminUserService.createUser(newUserRequest);
         log.info("Создан пользователь {}", user.getId());
         return user;
     }
