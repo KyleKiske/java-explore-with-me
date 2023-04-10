@@ -35,6 +35,7 @@ public class UserEventService {
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
     private final StatClient statClient;
@@ -57,8 +58,11 @@ public class UserEventService {
             hits.put(id, responseStatsDto.getHits());
         }
         for (EventShortDto eventShortDto: dtoList) {
+            List<Comment> commentList = commentRepository.findAllByEventId(eventShortDto.getId());
             eventShortDto.setViews(hits.get(eventShortDto.getId()));
+            eventShortDto.setCommentCount(commentList.size());
         }
+
         return dtoList;
     }
 
@@ -85,6 +89,7 @@ public class UserEventService {
             throw new EventNotFoundException(eventId.toString());
         }
         String fullUri = URI + eventId;
+        List<Comment> comments = commentRepository.findAllByEventId(eventId);
         String start = LocalDateTime.now().minusYears(10).format(dateTimeFormatter);
         String end = LocalDateTime.now().plusYears(10).format(dateTimeFormatter);
         List<ResponseStatsDto> stats = statClient.get(start,
@@ -95,6 +100,7 @@ public class UserEventService {
         } else {
             result.setViews(stats.get(0).getHits());
         }
+        result.setCommentCount(comments.size());
         return result;
     }
 
@@ -104,7 +110,7 @@ public class UserEventService {
             throw new EventNotFoundException(eventId.toString());
         }
         if (event.getState().equals(State.PUBLISHED)) {
-            throw new EventIsPublishedException("Only pending or canceled events can be redacted.");
+            throw new EventPublishedException("Only pending or canceled events can be redacted.");
         }
         if (updateEvent.getEventDate() != null && updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new TimeRestrictionException("incorrect event date.");
@@ -116,6 +122,8 @@ public class UserEventService {
                 event.setState(State.CANCELED);
             }
         }
+        List<Comment> comments = commentRepository.findAllByEventId(eventId);
+
         event = eventMapper.updateEventAdminToEvent(event, updateEvent);
         eventRepository.save(event);
         String fullUri = URI + eventId;
@@ -127,6 +135,7 @@ public class UserEventService {
         } else {
             result.setViews(stats.get(0).getHits());
         }
+        result.setCommentCount(comments.size());
         return result;
     }
 

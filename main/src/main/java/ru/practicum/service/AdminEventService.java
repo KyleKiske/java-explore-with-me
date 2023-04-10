@@ -9,7 +9,7 @@ import ru.practicum.dto.notDto.StateAction;
 import ru.practicum.dto.notDto.UpdateEventRequest;
 import ru.practicum.exception.CategoryNotFoundException;
 import ru.practicum.exception.EventNotFoundException;
-import ru.practicum.exception.EventPublishingException;
+import ru.practicum.exception.EventPublishedException;
 import ru.practicum.exception.TimeRestrictionException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.*;
@@ -110,12 +110,12 @@ public class AdminEventService {
         if (updateEvent.getStateAction() != null) {
             if (updateEvent.getStateAction().equals(StateAction.PUBLISH_EVENT)) {
                 if (!event.getState().equals(State.PENDING)) {
-                    throw new EventPublishingException("Can't publish published or cancelled event.");
+                    throw new EventPublishedException("Can't publish published or cancelled event.");
                 }
                 event.setState(State.PUBLISHED);
             } else {
                 if (event.getState().equals(State.PUBLISHED)) {
-                    throw new EventPublishingException("Can't cancel published event.");
+                    throw new EventPublishedException("Can't cancel published event.");
                 }
                 event.setState(State.CANCELED);
             }
