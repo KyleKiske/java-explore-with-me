@@ -42,10 +42,17 @@ public class UserCommentService {
     }
 
     public CommentDto redactUserComment(Long userId, Long eventId, Long commentId, UpdateCommentDto updateCommentDto) {
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
-        eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId.toString()));
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId.toString());
+        }
+        if (!eventRepository.existsById(eventId)) {
+            throw new EventNotFoundException(eventId.toString());
+        }
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId.toString()));
+        if (!comment.getAuthor().getId().equals(userId)) {
+            throw new CommentNotFoundException(commentId.toString());
+        }
         if (LocalDateTime.now().isAfter(LocalDateTime.now().plusHours(2))) {
             throw new TimeRestrictionException("Cannot redact comment after 2 hours passed since publication");
         }
@@ -57,9 +64,16 @@ public class UserCommentService {
     }
 
     public void deleteUserComment(Long userId, Long eventId, Long commentId) {
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
-        eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId.toString()));
-        commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId.toString()));
-        commentRepository.deleteById(commentId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId.toString());
+        }
+        if (!eventRepository.existsById(eventId)) {
+            throw new EventNotFoundException(eventId.toString());
+        }
+        if (commentRepository.existsById(commentId)) {
+            commentRepository.deleteById(commentId);
+        } else {
+            throw new CommentNotFoundException(commentId.toString());
+        }
     }
 }

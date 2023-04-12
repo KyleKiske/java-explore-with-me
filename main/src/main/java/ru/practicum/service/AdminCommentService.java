@@ -14,8 +14,11 @@ public class AdminCommentService {
     private final CommentRepository commentRepository;
 
     public void deleteCommentById(Long commentId) {
-        commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId.toString()));
-        commentRepository.deleteById(commentId);
+        if (commentRepository.existsById(commentId)) {
+            commentRepository.deleteById(commentId);
+        } else {
+            throw new CommentNotFoundException(commentId.toString());
+        }
     }
 
 }
