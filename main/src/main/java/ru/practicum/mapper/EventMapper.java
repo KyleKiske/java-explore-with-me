@@ -28,6 +28,7 @@ public class EventMapper {
         eventShortDto.setPaid(event.getPaid());
         eventShortDto.setTitle(event.getTitle());
         eventShortDto.setViews(0L);
+        eventShortDto.setCommentCount(0);
 
         return eventShortDto;
     }
@@ -54,6 +55,7 @@ public class EventMapper {
         eventFullDto.setState(event.getState());
         eventFullDto.setTitle(event.getTitle());
         eventFullDto.setViews(0L);
+        eventFullDto.setCommentCount(0);
 
         return eventFullDto;
     }

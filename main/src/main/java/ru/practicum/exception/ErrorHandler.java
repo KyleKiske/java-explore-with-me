@@ -87,6 +87,16 @@ public class ErrorHandler {
                 LocalDateTime.now().format(dateTimeFormatter));
     }
 
+    @ExceptionHandler(CommentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleCommentNotFound(final CommentNotFoundException e) {
+        log.error("404 comment with id={} not found", e.getMessage(), e);
+        return new ApiError(HttpStatus.NOT_FOUND.toString(),
+                "Requested participation request not found.",
+                e.getMessage(),
+                LocalDateTime.now().format(dateTimeFormatter));
+    }
+
     @ExceptionHandler(DuplicateEmailException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDuplicateEmail(final DuplicateEmailException e) {
@@ -127,9 +137,9 @@ public class ErrorHandler {
                 LocalDateTime.now().format(dateTimeFormatter));
     }
 
-    @ExceptionHandler(EventIsPublishedException.class)
+    @ExceptionHandler(EventNotPublishedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleEventIsPublishedException(final EventIsPublishedException e) {
+    public ApiError handleEventNotPublishedException(final EventNotPublishedException e) {
         log.info("409 {}", e.getMessage());
         return new ApiError(HttpStatus.CONFLICT.toString(),
                 "Some of requirements in request not fulfilled.",
@@ -137,9 +147,9 @@ public class ErrorHandler {
                 LocalDateTime.now().format(dateTimeFormatter));
     }
 
-    @ExceptionHandler(EventPublishingException.class)
+    @ExceptionHandler(EventPublishedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleEventPublishingException(final EventPublishingException e) {
+    public ApiError handleEventPublishedException(final EventPublishedException e) {
         log.info("409 {}", e.getMessage());
         return new ApiError(HttpStatus.CONFLICT.toString(),
                 "Integrity constraint has been violated.",
